@@ -102,10 +102,10 @@ def translate_xy_coordinate(df, outfile=None, bboxfile=None):
 
 
 if __name__ == '__main__':
-    data_root_dir = '/media/FMI/tungsten_landing_gmicro_sem/'
+    data_root_dir = 'W:\landing\gmicro_sem'
     stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
     runnum_list = range(19)
-    outdir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/imagelist'
+    outdir = 'M:\hubo\juvenile_EM\OBDp_overview\imagelist'
     rundir_list = ['{}_run{:03d}'.format(stack_name, x) for x in runnum_list]
 
     stack_imgli_file = '{}_stack_imagelist.txt'.format(stack_name)
@@ -127,7 +127,6 @@ if __name__ == '__main__':
     get_stack_imgli(stack_imgli_file, grid_imgli_file, gridnum)
 
     df = pd.read_csv(grid_imgli_file, delimiter=';', header=None)
-
     imgli_vld, miss_idx = validate_image_list(df)
 
     if len(miss_idx):
