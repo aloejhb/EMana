@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import shutil
 import os
+import sys
+import warnings
 import glob
 import re
 import pandas as pd
@@ -42,15 +44,41 @@ def get_stack_imgli(infile, outfile, gridnum):
 def validate_image_list(df):
     zdiff = df[3].diff()
     zdiff = zdiff[1:]
-    vld_increase_z = zdiff >= 0
-    vld_seq_slice = zdiff <= 1
-    if not vld_increase_z.all():
-        raise Exception('Image list in valid! Image list should be sorted increasingly according to z.')
-    if not vld_seq_slice.all():
-        
-        raise Exception('Image list in valid! Missing slices!')
-    return True
+    increase_z = zdiff >= 0
+    no_missing_slice = zdiff <= 1
+    if not increase_z.all():
+        print('Image list in valid! Image list should be sorted increasingly according to z.')
+    if not no_missing_slice.all():
+        miss_idx = no_missing_slice[~no_missing_slice].index
+        print('Image list in valid! Missing slices!')
+    else:
+        miss_idx = [];
+    valid = increase_z.all() and no_missing_slice.all()
+    return valid, miss_idx
 
+
+def transform_z_coordinate(df, zrange_list, shrink, slice_to_del):
+    pass
+    # This function applies to the stack
+    # in which some slices has same distance in z
+    # but has index increment bigger than 1
+    # if len(slice_to_del):
+    #     new_df = df.drop(slice_to_del)
+    # for zrange in zrange_list:
+    #     # do something
+
+    # return new_df
+
+    
+def print_missing_slice(df, miss_idx, outfile=None):
+    union_idx = miss_idx.union(miss_idx-1)
+    df_miss = df.loc[union_idx.values]
+    if outfile:
+        df_miss.to_csv(outfile, header=None)
+    return df_miss
+
+
+# def shift_jumped_slices
 
 
 def find_bounding_box_3d(df):
@@ -59,16 +87,15 @@ def find_bounding_box_3d(df):
     return min_xyz, max_xyz
 
 
-def translate_coordinate(infile, outfile=None, bboxfile=None):
-    df = pd.read_csv(infile, delimiter=';', header=None)
-    vld = validate_image_list(df)
+def translate_xy_coordinate(df, outfile=None, bboxfile=None):
     min_xyz, max_xyz = find_bounding_box_3d(df)
-    df[[1, 2, 3]] = df[[1, 2, 3]] - min_xyz
+    df[[1, 2]] = df[[1, 2]] - min_xyz[0:2]
+    df.columns = ['file', 'x', 'y', 'slicenum']
     if outfile:
-        df.to_csv(outfile, header=None)
+        df.to_csv(outfile)
     if bboxfile:
         bbox_df = pd.concat([min_xyz, max_xyz], axis=1)
-        bbox_df = bbox_df.rename(index={1: 'x', 2: 'y', 3: 'z'},
+        bbox_df = bbox_df.rename(index={1: 'x', 2: 'y', 3: 'slicenum'},
                                  columns={0: 'min', 1: 'max'})
         bbox_df.to_csv(bboxfile)
     return df, min_xyz, max_xyz
@@ -81,6 +108,10 @@ if __name__ == '__main__':
     outdir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/imagelist'
     rundir_list = ['{}_run{:03d}'.format(stack_name, x) for x in runnum_list]
 
+    stack_imgli_file = '{}_stack_imagelist.txt'.format(stack_name)
+    gridnum = 5
+    grid_imgli_file = '{}_stack_grid{:04}_imagelist.txt'.format(stack_name, gridnum)
+
     os.chdir(outdir)
     # runimgli_list = []
     # for rundir in rundir_list:
@@ -90,16 +121,24 @@ if __name__ == '__main__':
     #     concatenate_imgli_files(indir, outfile)
     #     append_rundir(rundir, outfile)
 
-    # stack_imgli_file = '{}_stack_imagelist.txt'.format(stack_name)
+    
     # concatenate_files(runimgli_list, stack_imgli_file)
 
-    gridnum = 5
-    grid_imgli_file = '{}_stack_grid{:04}_imagelist.txt'.format(stack_name, gridnum)
-    # get_stack_imgli(stack_imgli_file, grid_imgli_file, gridnum)
+    get_stack_imgli(stack_imgli_file, grid_imgli_file, gridnum)
 
-    # df = pd.read_csv(grid_imgli_file, delimiter=';', header=None)
+    df = pd.read_csv(grid_imgli_file, delimiter=';', header=None)
+
+    imgli_vld, miss_idx = validate_image_list(df)
+
+    if len(miss_idx):
+        miss_slice_file =  grid_imgli_file.replace('imagelist.txt',
+                                                   'missed_slice.csv')
+        df_miss = print_missing_slice(df, miss_idx, miss_slice_file)
+        
     trans_grid_imgli_file = grid_imgli_file.replace('imagelist.txt',
-                                                    'translated_imagelist.csv')
-    df, min_xyz, max_xyz = translate_coordinate(grid_imgli_file,
-                                                trans_grid_imgli_file)
+                                                    'xy_translated_imagelist.csv')
+    bboxfile = grid_imgli_file.replace('imagelist.txt', 'bbox.csv')
+    df, min_xyz, max_xyz = translate_xy_coordinate(df,
+                                                   trans_grid_imgli_file,
+                                                   bboxfile)
 
