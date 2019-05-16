@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from PIL import Image
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -25,20 +26,22 @@ def paste_tiles_to_slice(slicedf, bbox, tile_size_px_py,
     if not (slicedf['slicenum'] == slicenum).all():
         raise Exception('Slice data frame must contain only one slicenum!')
     image_size = calc_slice_image_size(bbox, tile_size_px_py)
-    slice_image = Image.new('L', image_size)
-    for row in slicedf.iterrows():
-        tile = Image.open(row['file'])
+    slice_image = Image.new('L', tuple(image_size))
+    for idx, row in slicedf.iterrows():
+        tile_path = os.path.join(data_root_dir, row['file'])
+        tile = Image.open(tile_path)
         xypos = row[['x', 'y']].as_matrix()
-        slice_image.paste(tile, xypos)
+        slice_image.paste(tile, tuple(xypos))
     outfile = '{}_slice{:05d}.tif'.format(stack_name, slicenum)
     outpath = os.path.join(outdir, outfile)
     slice_image.save(outpath)
 
 
 if __name__ == '__main__':
-    data_root_dir = '/media/FMI/tungsten_landing_gmicro_sem/'
+    data_root_dir = 'W:\landing\gmicro_sem'
+    imgli_dir = 'M:\hubo\juvenile_EM\OBDp_overview\imagelist'
+    stack_image_dir = 'M:\hubo\juvenile_EM\OBDp_overview\stack_image'
     stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
-    imgli_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/imagelist'
     gridnum = 5
     imgli_file = '{}_stack_grid{:04}_xy_translated_imagelist.csv'.format(stack_name, gridnum)
     bboxfile =  '{}_stack_grid{:04}_bbox.csv'.format(stack_name, gridnum)
@@ -52,10 +55,12 @@ if __name__ == '__main__':
     # Load image list and bounding box
     imgli_path = os.path.join(imgli_dir, imgli_file)
     imgdf = pd.read_csv(imgli_path)
-    bbox = pd.read_csv(bboxfile)
+    bbox = pd.read_csv(os.path.join(imgli_dir, bboxfile))
     print(bbox)
     # Visually check whether the tiles are lying on a grid in a stack
     if visualize_tile_pos:
         plot_tile_pos(imgdf[::100])
 
-    paste_tiles_to_slice(imgdf, bbox, tile_size_px_py)
+    slicedf = imgdf[:30]
+    paste_tiles_to_slice(slicedf, bbox, tile_size_px_py, data_root_dir,
+                         stack_image_dir, stack_name)
