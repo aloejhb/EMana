@@ -1,7 +1,8 @@
 import os
 import pandas as pd
-from PIL import Image
+import logging
 import matplotlib.pyplot as plt
+from PIL import Image
 from mpl_toolkits.mplot3d import Axes3D
 
 def plot_tile_pos(df, zname='slicenum'):
@@ -22,8 +23,16 @@ def calc_slice_image_size(bbox, tile_size_px_py):
 
 def paste_tiles_to_slice(slicedf, bbox, tile_size_px_py,
                          data_root_dir, outdir, stack_name):
+<<<<<<< HEAD
     slicenum = slicedf['slicenum'].iloc[0]
     print('Pasting slice #{}'.format(slicenum))
+=======
+    slicenum = slicedf['slicenum'][1]
+    message = 'Pasting slice #{}'.slicenum
+    print(message)
+    logging.info(message)
+    
+>>>>>>> 20c2f3af87c6b89ffc2f26ec1b6d8e1d5aecc315
     if not (slicedf['slicenum'] == slicenum).all():
         raise Exception('Slice data frame must contain only one slicenum!')
     image_size = calc_slice_image_size(bbox, tile_size_px_py)
@@ -42,12 +51,17 @@ if __name__ == '__main__':
     platform = 'vm2'
     if platform == 'linux':
         data_root_dir = '/run/user/1000/gvfs/smb-share\:server\=tungsten-nas.fmi.ch\,share\=landing_gmicro_sem/'
-        imgli_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/imagelist'
-        stack_image_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/stack_image'
+        result_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview'
     else:
         data_root_dir = 'W:\landing\gmicro_sem'
-        imgli_dir = 'M:\hubo\juvenile_EM\OBDp_overview\imagelist'
-        stack_image_dir = 'M:\hubo\juvenile_EM\OBDp_overview\stack_image'
+        result_dir = 'M:\hubo\juvenile_EM\OBDp_overview\imagelist'
+
+    imgli_dir = os.path.join(result_dir, 'imagelist')
+    stack_image_dir = os.path.join(result_dir, 'stack_image')
+    logpath = os.path.join(result_dir, 'paste_tiles.log')
+    logging.basicConfig(filename='example.log')
+
+    
     stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
     gridnum = 5
     imgli_file = '{}_stack_grid{:04}_xy_translated_imagelist.csv'.format(stack_name, gridnum)
