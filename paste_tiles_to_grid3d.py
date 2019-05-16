@@ -22,8 +22,8 @@ def calc_slice_image_size(bbox, tile_size_px_py):
 
 def paste_tiles_to_slice(slicedf, bbox, tile_size_px_py,
                          data_root_dir, outdir, stack_name):
-    slicenum = slicedf['slicenum'][1]
-    print('Pasting slice #{}'.slicenum)
+    slicenum = slicedf['slicenum'].iloc[0]
+    print('Pasting slice #{}'.format(slicenum))
     if not (slicedf['slicenum'] == slicenum).all():
         raise Exception('Slice data frame must contain only one slicenum!')
     image_size = calc_slice_image_size(bbox, tile_size_px_py)
@@ -39,7 +39,7 @@ def paste_tiles_to_slice(slicedf, bbox, tile_size_px_py,
 
 
 if __name__ == '__main__':
-    platform = 'linux'
+    platform = 'vm2'
     if platform == 'linux':
         data_root_dir = '/run/user/1000/gvfs/smb-share\:server\=tungsten-nas.fmi.ch\,share\=landing_gmicro_sem/'
         imgli_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/imagelist'
