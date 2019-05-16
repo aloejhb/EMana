@@ -4,6 +4,7 @@ import logging
 import matplotlib.pyplot as plt
 from PIL import Image
 from mpl_toolkits.mplot3d import Axes3D
+from importlib import reload
 
 def plot_tile_pos(df, zname='slicenum'):
     # zname can also be 'z', if df contains a column named 'z'
@@ -23,16 +24,11 @@ def calc_slice_image_size(bbox, tile_size_px_py):
 
 def paste_tiles_to_slice(slicedf, bbox, tile_size_px_py,
                          data_root_dir, outdir, stack_name):
-<<<<<<< HEAD
     slicenum = slicedf['slicenum'].iloc[0]
-    print('Pasting slice #{}'.format(slicenum))
-=======
-    slicenum = slicedf['slicenum'][1]
-    message = 'Pasting slice #{}'.slicenum
+    message = 'Pasting slice #{}'.format(slicenum)
     print(message)
     logging.info(message)
-    
->>>>>>> 20c2f3af87c6b89ffc2f26ec1b6d8e1d5aecc315
+
     if not (slicedf['slicenum'] == slicenum).all():
         raise Exception('Slice data frame must contain only one slicenum!')
     image_size = calc_slice_image_size(bbox, tile_size_px_py)
@@ -54,12 +50,15 @@ if __name__ == '__main__':
         result_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview'
     else:
         data_root_dir = 'W:\landing\gmicro_sem'
-        result_dir = 'M:\hubo\juvenile_EM\OBDp_overview\imagelist'
+        result_dir = 'M:\hubo\juvenile_EM\OBDp_overview'
 
     imgli_dir = os.path.join(result_dir, 'imagelist')
     stack_image_dir = os.path.join(result_dir, 'stack_image')
+    reload(logging)
     logpath = os.path.join(result_dir, 'paste_tiles.log')
-    logging.basicConfig(filename='example.log')
+    logging.basicConfig(filename=logpath, level=logging.DEBUG,
+                        format='%(asctime)-15s %(message)s')
+    logging.info('Starting to paste tiles ...')
 
     
     stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
@@ -86,11 +85,11 @@ if __name__ == '__main__':
     grouped_imgdf = imgdf.groupby('slicenum')
 
     
-    subgrouped = [g[1] for g in list(grouped_imgdf)[:5]]
+    # subgrouped = [g[1] for g in list(grouped_imgdf)[:5]]
     # for name, group in grouped_imgdf:
     #     print(group)
 
-    for group in subgrouped:
+    for name, group in grouped_imgdf:
         paste_tiles_to_slice(group, bbox, tile_size_px_py,
                              data_root_dir,stack_image_dir, stack_name)
         
