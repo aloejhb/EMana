@@ -23,6 +23,7 @@ def calc_slice_image_size(bbox, tile_size_px_py):
 def paste_tiles_to_slice(slicedf, bbox, tile_size_px_py,
                          data_root_dir, outdir, stack_name):
     slicenum = slicedf['slicenum'][1]
+    print('Pasting slice #{}'.slicenum)
     if not (slicedf['slicenum'] == slicenum).all():
         raise Exception('Slice data frame must contain only one slicenum!')
     image_size = calc_slice_image_size(bbox, tile_size_px_py)
@@ -38,9 +39,15 @@ def paste_tiles_to_slice(slicedf, bbox, tile_size_px_py,
 
 
 if __name__ == '__main__':
-    data_root_dir = 'W:\landing\gmicro_sem'
-    imgli_dir = 'M:\hubo\juvenile_EM\OBDp_overview\imagelist'
-    stack_image_dir = 'M:\hubo\juvenile_EM\OBDp_overview\stack_image'
+    platform = 'linux'
+    if platform == 'linux':
+        data_root_dir = '/run/user/1000/gvfs/smb-share\:server\=tungsten-nas.fmi.ch\,share\=landing_gmicro_sem/'
+        imgli_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/imagelist'
+        stack_image_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/stack_image'
+    else:
+        data_root_dir = 'W:\landing\gmicro_sem'
+        imgli_dir = 'M:\hubo\juvenile_EM\OBDp_overview\imagelist'
+        stack_image_dir = 'M:\hubo\juvenile_EM\OBDp_overview\stack_image'
     stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
     gridnum = 5
     imgli_file = '{}_stack_grid{:04}_xy_translated_imagelist.csv'.format(stack_name, gridnum)
@@ -61,6 +68,16 @@ if __name__ == '__main__':
     if visualize_tile_pos:
         plot_tile_pos(imgdf[::100])
 
-    slicedf = imgdf[:30]
-    paste_tiles_to_slice(slicedf, bbox, tile_size_px_py, data_root_dir,
-                         stack_image_dir, stack_name)
+
+    grouped_imgdf = imgdf.groupby('slicenum')
+
+    
+    subgrouped = [g[1] for g in list(grouped_imgdf)[:5]]
+    # for name, group in grouped_imgdf:
+    #     print(group)
+
+    for group in subgrouped:
+        paste_tiles_to_slice(group, bbox, tile_size_px_py,
+                             data_root_dir,stack_image_dir, stack_name)
+        
+
