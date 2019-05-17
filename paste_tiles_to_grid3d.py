@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
     
     stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
-    gridnum = 5
+    gridnum = 1
     imgli_file = '{}_stack_grid{:04}_xy_translated_imagelist.csv'.format(stack_name, gridnum)
     bboxfile =  '{}_stack_grid{:04}_bbox.csv'.format(stack_name, gridnum)
 
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     pixel_size = 50.0  # unit in um
     overlap = 200  # unit in px
 
-    visualize_tile_pos = False
+    visualize_tile_pos = True
 
     # Load image list and bounding box
     imgli_path = os.path.join(imgli_dir, imgli_file)
@@ -84,8 +84,6 @@ if __name__ == '__main__':
 
     grouped_imgdf = imgdf.groupby('slicenum')
     group_name_list = [name for name, group in grouped_imgdf]
-    
-
 
     # for name, group in grouped_imgdf:
 #    for group in subgrouped:

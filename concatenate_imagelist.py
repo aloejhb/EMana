@@ -28,6 +28,7 @@ def append_rundir_to_filepath(rundir, imgli_file, outfile=None):
         outfile = imgli_file
     with open(imgli_file, 'r') as f:
         fil = f.read().rstrip('\n')
+    # TODO ignore empty lines!!
     with open(outfile, 'w') as f:
         f.write(re.sub(r'(?m)^', r'{}\\'.format(rundir), fil))
 
