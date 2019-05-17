@@ -57,19 +57,6 @@ def validate_image_list(df):
     valid = increase_z.all() and no_missing_slice.all()
     return valid, miss_idx
 
-
-def transform_z_coordinate(df, zrange_list, shrink, slice_to_del):
-    pass
-    # This function applies to the stack
-    # in which some slices has same distance in z
-    # but has index increment bigger than 1
-    # if len(slice_to_del):
-    #     new_df = df.drop(slice_to_del)
-    # for zrange in zrange_list:
-    #     # do something
-
-    # return new_df
-
     
 def print_missing_slice(df, miss_idx, outfile=None):
     union_idx = miss_idx.union(miss_idx-1)
@@ -77,9 +64,6 @@ def print_missing_slice(df, miss_idx, outfile=None):
     if outfile:
         df_miss.to_csv(outfile, header=None)
     return df_miss
-
-
-# def shift_jumped_slices
 
 
 def find_bounding_box_3d(df):
