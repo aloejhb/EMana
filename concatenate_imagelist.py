@@ -102,13 +102,15 @@ def translate_xy_coordinate(df, outfile=None, bboxfile=None):
 
 
 if __name__ == '__main__':
-    data_root_dir = '/run/user/1000/gvfs/smb-share\:server\=tungsten-nas.fmi.ch\,share\=landing_gmicro_sem/'
-    outdir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/imagelist'
-    
-    # data_root_dir = 'W:\landing\gmicro_sem'
-    # outdir = 'M:\hubo\juvenile_EM\OBDp_overview\imagelist'
+    platform = 'vm2'
+    if platform == 'linux':
+        data_root_dir = '/run/user/1000/gvfs/smb-share\:server\=tungsten-nas.fmi.ch\,share\=landing_gmicro_sem/'
+        outdir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/imagelist'
+    else: 
+        data_root_dir = 'W:\landing\gmicro_sem'
+        outdir = 'M:\hubo\juvenile_EM\OBDp_overview\imagelist'
     stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
-    runnum_list = range(19)
+    runnum_list = range(20)
     rundir_list = ['{}_run{:03d}'.format(stack_name, x) for x in runnum_list]
 
     stack_imgli_file = '{}_stack_imagelist.txt'.format(stack_name)

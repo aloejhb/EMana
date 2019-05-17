@@ -83,14 +83,21 @@ if __name__ == '__main__':
 
 
     grouped_imgdf = imgdf.groupby('slicenum')
-
+    group_name_list = [name for name, group in grouped_imgdf]
     
-    # subgrouped = [g[1] for g in list(grouped_imgdf)[:5]]
-    # for name, group in grouped_imgdf:
-    #     print(group)
 
-    for name, group in grouped_imgdf:
+
+    # for name, group in grouped_imgdf:
+#    for group in subgrouped:
+#        paste_tiles_to_slice(group, bbox, tile_size_px_py,
+#                             data_root_dir,stack_image_dir, stack_name)
+    
+    # Find breakpoint
+    break_slice_num = 6302
+    break_group_idx = group_name_list.index(break_slice_num)
+    print(break_group_idx)
+    
+    subgrouped = [g[1] for g in list(grouped_imgdf)[break_group_idx:]]
+    for group in subgrouped:
         paste_tiles_to_slice(group, bbox, tile_size_px_py,
                              data_root_dir,stack_image_dir, stack_name)
-        
-
