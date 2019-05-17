@@ -87,13 +87,15 @@ def translate_xy_coordinate(df, outfile=None, bboxfile=None):
 
 
 if __name__ == '__main__':
-    platform = 'vm2'
+    platform = 'linux'
     if platform == 'linux':
-        data_root_dir = '/run/user/1000/gvfs/smb-share\:server\=tungsten-nas.fmi.ch\,share\=landing_gmicro_sem/'
+        data_root_dir = '/run/user/1000/gvfs/smb-share:server=tungsten-nas.fmi.ch,share=landing_gmicro_sem'
         outdir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/imagelist'
     else: 
         data_root_dir = 'W:\landing\gmicro_sem'
         outdir = 'M:\hubo\juvenile_EM\OBDp_overview\imagelist'
+
+    imgli_sub_dir = 'run_imagelist'
     stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
     runnum_list = range(20)
     rundir_list = ['{}_run{:03d}'.format(stack_name, x) for x in runnum_list]
@@ -103,11 +105,14 @@ if __name__ == '__main__':
     grid_imgli_file = '{}_stack_grid{:04}_imagelist.txt'.format(stack_name, gridnum)
 
     os.chdir(outdir)
-    
+    if not os.path.isdir(imgli_sub_dir):
+        os.mkdir(imgli_sub_dir)
+        
     runimgli_list = []
     for rundir in rundir_list:
         indir = os.path.join(data_root_dir, rundir)
         outfile = '{}_imagelist.txt'.format(rundir)
+        outfile = os.path.join(imgli_sub_dir, outfile)
         runimgli_list.append(outfile)
         concatenate_imgli_files(indir, outfile)
         append_rundir_to_filepath(rundir, outfile)
