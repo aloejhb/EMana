@@ -101,7 +101,7 @@ if __name__ == '__main__':
     rundir_list = ['{}_run{:03d}'.format(stack_name, x) for x in runnum_list]
 
     stack_imgli_file = '{}_stack_imagelist.txt'.format(stack_name)
-    gridnum = 5
+    gridnum = 1
     grid_imgli_file = '{}_stack_grid{:04}_imagelist.txt'.format(stack_name, gridnum)
 
     os.chdir(outdir)

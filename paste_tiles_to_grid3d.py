@@ -44,7 +44,7 @@ def paste_tiles_to_slice(slicedf, bbox, tile_size_px_py,
 
 
 if __name__ == '__main__':
-    platform = 'vm2'
+    platform = 'linux'
     if platform == 'linux':
         data_root_dir = '/run/user/1000/gvfs/smb-share\:server\=tungsten-nas.fmi.ch\,share\=landing_gmicro_sem/'
         result_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview'
@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
     
     stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
-    gridnum = 1
+    gridnum = 5
     imgli_file = '{}_stack_grid{:04}_xy_translated_imagelist.csv'.format(stack_name, gridnum)
     bboxfile =  '{}_stack_grid{:04}_bbox.csv'.format(stack_name, gridnum)
 
@@ -82,20 +82,20 @@ if __name__ == '__main__':
         plot_tile_pos(imgdf[::100])
 
 
-    grouped_imgdf = imgdf.groupby('slicenum')
-    group_name_list = [name for name, group in grouped_imgdf]
+#     grouped_imgdf = imgdf.groupby('slicenum')
+#     group_name_list = [name for name, group in grouped_imgdf]
 
-    # for name, group in grouped_imgdf:
-#    for group in subgrouped:
-#        paste_tiles_to_slice(group, bbox, tile_size_px_py,
-#                             data_root_dir,stack_image_dir, stack_name)
+#     # for name, group in grouped_imgdf:
+# #    for group in subgrouped:
+# #        paste_tiles_to_slice(group, bbox, tile_size_px_py,
+# #                             data_root_dir,stack_image_dir, stack_name)
     
-    # Find breakpoint
-    break_slice_num = 6302
-    break_group_idx = group_name_list.index(break_slice_num)
-    print(break_group_idx)
+#     # Find breakpoint
+#     break_slice_num = 6302
+#     break_group_idx = group_name_list.index(break_slice_num)
+#     print(break_group_idx)
     
-    subgrouped = [g[1] for g in list(grouped_imgdf)[break_group_idx:]]
-    for group in subgrouped:
-        paste_tiles_to_slice(group, bbox, tile_size_px_py,
-                             data_root_dir,stack_image_dir, stack_name)
+#     subgrouped = [g[1] for g in list(grouped_imgdf)[break_group_idx:]]
+#     for group in subgrouped:
+#         paste_tiles_to_slice(group, bbox, tile_size_px_py,
+#                              data_root_dir,stack_image_dir, stack_name)
