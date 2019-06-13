@@ -67,21 +67,21 @@ def print_missing_slice(df, miss_idx, outfile=None):
 
 
 def find_bounding_box_3d(df):
-    min_xyz = df[[1, 2, 3]].min()
-    max_xyz = df[[1, 2, 3]].max()
+    min_xyz = df[['x', 'y', 'slicenum']].min()
+    max_xyz = df[['x', 'y', 'slicenum']].max()
     return min_xyz, max_xyz
 
 
 def translate_xy_coordinate(df, outfile=None, bboxfile=None):
-    min_xyz, max_xyz = find_bounding_box_3d(df)
-    df[[1, 2]] = df[[1, 2]] - min_xyz[0:2]
     df.columns = ['file', 'x', 'y', 'slicenum']
+    min_xyz, max_xyz = find_bounding_box_3d(df)
+    df[['x', 'y']] = df[['x', 'y']] - min_xyz[0:2]
+
     if outfile:
         df.to_csv(outfile)
     if bboxfile:
         bbox_df = pd.concat([min_xyz, max_xyz], axis=1)
-        bbox_df = bbox_df.rename(index={1: 'x', 2: 'y', 3: 'slicenum'},
-                                 columns={0: 'min', 1: 'max'})
+        bbox_df = bbox_df.rename(columns={0: 'min', 1: 'max'})
         bbox_df.to_csv(bboxfile)
     return df, min_xyz, max_xyz
 
