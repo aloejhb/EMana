@@ -2,16 +2,19 @@ import os
 import glob
 import configparser
 import pandas as pd
+import json
 
 
 def config_to_dataframe(file_path, section_list, keyli_list):
+    if not os.path.isfile(file_path):
+        raise Exception('File not found! {}'.format(file_path))
     file_name = os.path.basename(file_path)
     df = pd.DataFrame([file_name], columns=['file_name'])
     parser = configparser.ConfigParser()
     parser.read(file_path)
     for section, keyli in zip(section_list, keyli_list):
         for key in keyli:
-            value = json.loads(parser[section][key]
+            value = json.loads(parser[section][key])
             colname = '{}.{}'.format(section, key)
             df[colname] = [value]
     return df
@@ -26,6 +29,8 @@ def get_file_list(rundir, file_type):
 
 def concat_config_to_dataframe(data_root_dir, rundir, section_list, keyli_list):
     rundir_fp = os.path.join(data_root_dir, rundir)
+    if not os.path.isdir(rundir_fp):
+        raise Exception('No suce directory! {}'.format(rundir_fp))
     file_list = get_file_list(rundir_fp, 'config')
     df_list = [config_to_dataframe(fi, section_list, keyli_list) for fi in file_list]
     df = pd.concat(df_list)

@@ -13,7 +13,6 @@ def plot_tile_pos(df, zname='slicenum'):
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel(zname)
-    plt.show()
 
 
 def calc_slice_image_size(bbox, tile_size_px_py):
@@ -80,6 +79,7 @@ if __name__ == '__main__':
     # Visually check whether the tiles are lying on a grid in a stack
     if visualize_tile_pos:
         plot_tile_pos(imgdf[::100])
+        plt.show()
 
 
 #     grouped_imgdf = imgdf.groupby('slicenum')

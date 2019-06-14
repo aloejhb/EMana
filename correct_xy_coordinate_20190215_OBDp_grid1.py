@@ -2,8 +2,10 @@ import os
 import math
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 from concatenate_imagelist import translate_xy_coordinate
+from paste_tiles_to_grid3d import plot_tile_pos
 
 def compute_transform_mat(scale_x, scale_y, rot_x, rot_y):
     angle_diff = rot_x - rot_y
@@ -17,13 +19,18 @@ def compute_transform_mat(scale_x, scale_y, rot_x, rot_y):
 def convert_to_d(s_coordinates, transform_mat, scale_x, scale_y):
     """Convert stage coordinates into SEM coordinates"""
     A, B, C, D = transform_mat
-    stage_x, stage_y = s_coordinates
-    stage_x /= scale_x
-    stage_y /= scale_y
-    dx = ((stage_y + stage_x * (-D/C))/
-          (B + A * (-D/C)))
-    dy = ((stage_y - dx * B) / D)
-    return [dx, dy]
+    # stage_x, stage_y = s_coordinates
+    # stage_x /= scale_x
+    # stage_y /= scale_y
+    # dx = ((stage_y + stage_x * (-D/C))/
+    #       (B + A * (-D/C)))
+    # dy = ((stage_y - dx * B) / D)
+    # dc = [dx, dy]
+    sc = np.array(s_coordinates)
+    transform_mat2 = np.array([[A, C], [B, D]])
+    scale_mat = np.diag([scale_x, scale_y])
+    dc = np.linalg.inv(transform_mat2).dot(np.linalg.inv(scale_mat).dot(sc))
+    return dc
 
 
 def convert_to_p(d_coordinates, pixel_size):
@@ -38,7 +45,7 @@ def compute_correct_origin(configdf, CS_PIXEL_SIZE=10):
     rot_y = configdf.loc[0, 'stage_rotation_angle_y']
     transform_mat = compute_transform_mat(scale_x, scale_y, rot_x, rot_y)
 
-    origin_d_list = [convert_to_d([row['origin_sx'], row['origin_sx']],
+    origin_d_list = [convert_to_d([row['origin_sx'], row['origin_sy']],
                                   transform_mat, scale_x, scale_y)
                      for idx, row in configdf.iterrows()]
 
@@ -52,18 +59,24 @@ def compute_correct_origin(configdf, CS_PIXEL_SIZE=10):
 
 
 def correct_xy_coord(imglidf, wrong_origin_list, correct_origin_list, slicenum_list):
-    slicenum_list.append(imglidf.iloc[-1, 3]+1)
+    imglidf2 = imglidf.copy()
+    slicenum_list.append(imglidf2.iloc[-1, 3]+1)
     for k in range(len(slicenum_list)-1):
         wrong_origin = wrong_origin_list[k]
         correct_origin = correct_origin_list[k]
         slice_range = slicenum_list[k:k+2]
-        tile_idx = (imglidf['slicenum'] >= slice_range[0])*\
-                   (imglidf['slicenum'] < slice_range[1])
-        newx = imglidf.loc[tile_idx, 'x'] - wrong_origin[0] + correct_origin[0]
-        newy = imglidf.loc[tile_idx, 'y'] - wrong_origin[1] + correct_origin[1]
-        imglidf.set_value(tile_idx, 'x', newx)
-        imglidf.set_value(tile_idx, 'y', newy)
-    return imglidf
+        tile_idx = (imglidf2['slicenum'] >= slice_range[0]) &\
+                   (imglidf2['slicenum'] < slice_range[1])
+        newx = imglidf2.loc[tile_idx, 'x'] - wrong_origin[0] + correct_origin[0]
+        newy = imglidf2.loc[tile_idx, 'y'] - wrong_origin[1] + correct_origin[1]
+        # print('...................')
+        # print(imglidf2.loc[tile_idx, 'x'].iloc[0])
+        # print(newx.iloc[0])
+        imglidf2.set_value(tile_idx, 'x', newx)
+        imglidf2.set_value(tile_idx, 'y', newy)
+        # print(imglidf2.loc[tile_idx, 'x'].iloc[0])
+        # print('...................')
+    return imglidf2
         
 
 if __name__ == '__main__':
@@ -103,3 +116,8 @@ if __name__ == '__main__':
     df, min_xyz, max_xyz = translate_xy_coordinate(correct_imglidf,
                                                    trans_imgli_file,
                                                    bboxfile)
+
+    plot_tile_pos(imglidf[::100])
+    plot_tile_pos(correct_imglidf[::100])
+    plt.show()
+

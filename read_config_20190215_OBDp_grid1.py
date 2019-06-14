@@ -20,7 +20,7 @@ stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
 runnum_list = range(20)
 rundir_list = ['{}_run{:03d}'.format(stack_name, x) for x in runnum_list]
 
-section_list = ['grids', 'acq', 'sem']
+section_list = ['grids', 'acq', 'microtome']
 keyli_list = [['origin_sx_sy', 'pixel_size', 'tile_size_px_py', 'active_tiles'],
               ['slice_counter', 'slice_thickness'],
               ['stage_scale_factor_x', 'stage_scale_factor_y',
@@ -44,10 +44,10 @@ grid1df['tile_size_py'] = [x[1][1] for x in stack_df['grids.tile_size_px_py']]
 grid1df['slice_counter'] = stack_df['acq.slice_counter']
 grid1df['slice_thickness'] = stack_df['acq.slice_thickness']
 
-grid1df['stage_scale_factor_x'] = stack_df['sem.stage_scale_factor_x']
-grid1df['stage_scale_factor_y'] = stack_df['sem.stage_scale_factor_y']
-grid1df['stage_rotation_angle_x'] = stack_df['sem.stage_rotation_angle_x']
-grid1df['stage_rotation_angle_y'] = stack_df['sem.stage_rotation_angle_y']
+grid1df['stage_scale_factor_x'] = stack_df['microtome.stage_scale_factor_x']
+grid1df['stage_scale_factor_y'] = stack_df['microtome.stage_scale_factor_y']
+grid1df['stage_rotation_angle_x'] = stack_df['microtome.stage_rotation_angle_x']
+grid1df['stage_rotation_angle_y'] = stack_df['microtome.stage_rotation_angle_y']
 
 
 grid1df['active_tiles'] = [x[1] for x in stack_df['grids.active_tiles']]

@@ -1,10 +1,12 @@
 from paste_tiles_to_grid3d import plot_tile_pos
 
-imgli_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/imagelist/correct_xy_grid1/'
-imgli_file = '20190215_Bo_juvenile_overviewstackOBDp_stack_grid0001_xy_corrected_xy_translated_imagelist.csv'
+# imgli_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/imagelist/correct_xy_grid1/'
+# imgli_file = '20190215_Bo_juvenile_overviewstackOBDp_stack_grid0001_xy_corrected_xy_translated_imagelist.csv'
+# imgli_file = '20190215_Bo_juvenile_overviewstackOBDp_stack_grid0001_xy_corrected_imagelist.csv'
 imgli_path = os.path.join(imgli_dir, imgli_file)
 imgdf = pd.read_csv(imgli_path)
 plot_tile_pos(imgdf[::100])
+
 
 # platform = 'linux'
 # if platform == 'linux':
