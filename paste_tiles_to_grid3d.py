@@ -64,6 +64,8 @@ if __name__ == '__main__':
     stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
     gridnum = 5
     imgli_file = '{}_stack_grid{:04}_xy_translated_imagelist.csv'.format(stack_name, gridnum)
+    # Manually corrected imagelist for missing slices
+    imgli_file = imgli_file.replace('.csv', '_add_missing_slice_manually.csv')
     bboxfile =  '{}_stack_grid{:04}_bbox.csv'.format(stack_name, gridnum)
 
     tile_size_px_py = [2048, 1536]  # unit in px
@@ -93,11 +95,11 @@ if __name__ == '__main__':
 #                             data_root_dir,stack_image_dir, stack_name)
     
     # Find breakpoint
-    break_slice_num = 6302
+    break_slice_num = 3733
     break_group_idx = group_name_list.index(break_slice_num)
     print(break_group_idx)
     
-    subgrouped = [g[1] for g in list(grouped_imgdf)[break_group_idx:]]
+    subgrouped = [g[1] for g in list(grouped_imgdf)[break_group_idx:break_group_idx+3]]
     for group in subgrouped:
         paste_tiles_to_slice(group, bbox, tile_size_px_py,
                              data_root_dir,stack_image_dir, stack_name)
