@@ -13,7 +13,6 @@ def plot_tile_pos(df, zname='slicenum'):
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel(zname)
-    plt.show()
 
 
 def calc_slice_image_size(bbox, tile_size_px_py):
@@ -44,7 +43,7 @@ def paste_tiles_to_slice(slicedf, bbox, tile_size_px_py,
 
 
 if __name__ == '__main__':
-    platform = 'vm2'
+    platform = 'linux'
     if platform == 'linux':
         data_root_dir = '/run/user/1000/gvfs/smb-share\:server\=tungsten-nas.fmi.ch\,share\=landing_gmicro_sem/'
         result_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview'
@@ -72,7 +71,7 @@ if __name__ == '__main__':
     pixel_size = 50.0  # unit in um
     overlap = 200  # unit in px
 
-    visualize_tile_pos = False
+    visualize_tile_pos = True
 
     # Load image list and bounding box
     imgli_path = os.path.join(imgli_dir, imgli_file)
@@ -82,17 +81,16 @@ if __name__ == '__main__':
     # Visually check whether the tiles are lying on a grid in a stack
     if visualize_tile_pos:
         plot_tile_pos(imgdf[::100])
+        plt.show()
 
 
-    grouped_imgdf = imgdf.groupby('slicenum')
-    group_name_list = [name for name, group in grouped_imgdf]
-    
+#     grouped_imgdf = imgdf.groupby('slicenum')
+#     group_name_list = [name for name, group in grouped_imgdf]
 
-
-    # for name, group in grouped_imgdf:
-#    for group in subgrouped:
-#        paste_tiles_to_slice(group, bbox, tile_size_px_py,
-#                             data_root_dir,stack_image_dir, stack_name)
+#     # for name, group in grouped_imgdf:
+# #    for group in subgrouped:
+# #        paste_tiles_to_slice(group, bbox, tile_size_px_py,
+# #                             data_root_dir,stack_image_dir, stack_name)
     
     # Find breakpoint
     break_slice_num = 3733
