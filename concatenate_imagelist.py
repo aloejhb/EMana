@@ -7,13 +7,7 @@ import glob
 import re
 import pandas as pd
 
-
-def concatenate_files(infile_list, outfile):
-    with open(outfile, 'wb') as fout:
-        for infile in infile_list:
-            with open(infile, 'rb') as fin:
-                shutil.copyfileobj(fin, fout)
-            fout.write(os.linesep.encode('utf-8'))
+from concatenate_log import concat_files
 
 
 def concatenate_imgli_files(rundir, outfile):
@@ -43,7 +37,7 @@ def get_stack_imgli(infile, outfile, gridnum):
 
 
 def validate_image_list(df):
-    zdiff = df[3].diff()
+    zdiff = df['slicenum'].diff()
     zdiff = zdiff[1:]
     increase_z = zdiff >= 0
     no_missing_slice = zdiff <= 1
@@ -73,7 +67,6 @@ def find_bounding_box_3d(df):
 
 
 def translate_xy_coordinate(df, outfile=None, bboxfile=None):
-    df.columns = ['file', 'x', 'y', 'slicenum']
     min_xyz, max_xyz = find_bounding_box_3d(df)
     df[['x', 'y']] = df[['x', 'y']] - min_xyz[0:2]
 
@@ -122,6 +115,7 @@ if __name__ == '__main__':
     get_stack_imgli(stack_imgli_file, grid_imgli_file, gridnum)
 
     df = pd.read_csv(grid_imgli_file, delimiter=';', header=None)
+    df.columns = ['file', 'x', 'y', 'slicenum']
     imgli_vld, miss_idx = validate_image_list(df)
 
     if len(miss_idx):

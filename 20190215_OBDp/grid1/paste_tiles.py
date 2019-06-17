@@ -1,20 +1,22 @@
 from paste_tiles_to_grid3d import plot_tile_pos
+import matplotlib.pyplot as plt
 
-# imgli_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview/imagelist/correct_xy_grid1/'
-# imgli_file = '20190215_Bo_juvenile_overviewstackOBDp_stack_grid0001_xy_corrected_xy_translated_imagelist.csv'
-# imgli_file = '20190215_Bo_juvenile_overviewstackOBDp_stack_grid0001_xy_corrected_imagelist.csv'
-imgli_path = os.path.join(imgli_dir, imgli_file)
-imgdf = pd.read_csv(imgli_path)
+platform = 'linux'
+if platform == 'linux':
+    data_root_dir = '/run/user/1000/gvfs/smb-share\:server\=tungsten-nas.fmi.ch\,share\=landing_gmicro_sem/'
+    result_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview'
+else:
+    data_root_dir = 'W:\landing\gmicro_sem'
+    result_dir = 'M:\hubo\juvenile_EM\OBDp_overview'
+
+
+imgli_dir = os.path.join(result_dir, 'imagelist/grid1/check_missing_slice/')
+imgli_filename = '20190215_Bo_juvenile_overviewstackOBDp_add_missing_slice.csv'
+imgli_file = os.path.join(imgli_dir, imgli_filename)
+imgdf = pd.read_csv(imgli_file)
 plot_tile_pos(imgdf[::100])
+plt.show()
 
-
-# platform = 'linux'
-# if platform == 'linux':
-#     data_root_dir = '/run/user/1000/gvfs/smb-share\:server\=tungsten-nas.fmi.ch\,share\=landing_gmicro_sem/'
-#     result_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview'
-# else:
-#     data_root_dir = 'W:\landing\gmicro_sem'
-#     result_dir = 'M:\hubo\juvenile_EM\OBDp_overview'
 
 # imgli_dir = os.path.join(result_dir, 'imagelist')
 # stack_image_dir = os.path.join(result_dir, 'stack_image')

@@ -4,6 +4,7 @@ import configparser
 import pandas as pd
 import json
 
+from concat_log import get_file_list
 
 def config_to_dataframe(file_path, section_list, keyli_list):
     if not os.path.isfile(file_path):
@@ -18,13 +19,6 @@ def config_to_dataframe(file_path, section_list, keyli_list):
             colname = '{}.{}'.format(section, key)
             df[colname] = [value]
     return df
-
-
-def get_file_list(rundir, file_type):
-    logdir = os.path.join(rundir, 'meta', 'logs')
-    file_pattern = os.path.join(logdir, '{}_*'.format(file_type))
-    file_list = sorted(glob.glob(file_pattern))
-    return file_list
 
 
 def concat_config_to_dataframe(data_root_dir, rundir, section_list, keyli_list):
