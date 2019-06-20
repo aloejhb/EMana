@@ -4,13 +4,13 @@ import pandas as pd
 import numpy as np
 import re
 from copy import deepcopy
-sys.path.insert(0,'../../EMana/')
+sys.path.insert(0,'../../')
 from concatenate_imagelist import validate_image_list
 
 def modify_slice(template_slice, slicenum):
     new_slice = deepcopy(template_slice)
     new_slice['slicenum'] = slicenum
-    old_slicenum_pattern = r's\d{5}'
+    old_slicenum_pattern = r'_s\d{5}.tif'
     new_slicenum_str = '_s{0:05d}.tif'.format(slicenum)
     new_slice['file'] = [re.sub(old_slicenum_pattern, new_slicenum_str, x) for x in new_slice['file']]
     return new_slice
@@ -30,8 +30,8 @@ def add_missing_slice(imglidf, miss_slice_list):
         print(miss_range)
         template_slice = imglidf[imglidf['slicenum'] == (miss_range[0]-1)]
 
-        drop_idx = (imglidf['slicenum'] == miss_range[0]) | \
-                   (imglidf['slicenum'] == miss_range[1])
+        drop_idx = (imglidf['slicenum'] >= miss_range[0]) & \
+                   (imglidf['slicenum'] <= miss_range[1])
 
         insert_idx = np.where(drop_idx)[0][0]
         imglidf = imglidf.drop(imglidf[drop_idx].index)
@@ -65,11 +65,12 @@ if __name__=='__main__':
     imglidf = pd.read_csv(infile, index_col=0)
     missdf = pd.read_csv(miss_slice_file, header=None)
 
-    miss_slice_list = missdf[4].tolist()
+    # miss_slice_list = missdf[4].tolist()
+    miss_slice_list = [388, 395, 453, 458, 1129, 1134]
 
     if len(miss_slice_list) % 2:
         raise Exception('miss_slice_list should be pairs')
 
     imglidf2 = add_missing_slice(imglidf, miss_slice_list)
     valid_imgli, still_missing_idx = validate_image_list(imglidf2)
-    # imglidf2.to_csv(outfile)
+    imglidf2.to_csv(outfile)
