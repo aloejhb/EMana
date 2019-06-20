@@ -1,48 +1,66 @@
-from paste_tiles_to_grid3d import plot_tile_pos
+import os
+import sys
 import matplotlib.pyplot as plt
+import pandas as pd
+import logging
 
-platform = 'linux'
+from importlib import reload
+emana_path = 'M:\hubo\juvenile_EM\scripts\EMana'
+sys.path.insert(0, emana_path)
+from paste_tiles_to_grid3d import plot_tile_pos, paste_tiles_to_slice
+
+platform = 'windows'
 if platform == 'linux':
     data_root_dir = '/run/user/1000/gvfs/smb-share\:server\=tungsten-nas.fmi.ch\,share\=landing_gmicro_sem/'
-    result_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview'
+    imgli_root_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview'
+    result_root_dir = '/home/hubo/Projects/juvenile_EM/OBDp_overview'
 else:
     data_root_dir = 'W:\landing\gmicro_sem'
-    result_dir = 'M:\hubo\juvenile_EM\OBDp_overview'
+    imgli_root_dir = 'M:\hubo\juvenile_EM\OBDp_overview'
+    result_root_dir = 'Z:\BoHu\juvenile_EM\OBDp_overview'
 
-
-imgli_dir = os.path.join(result_dir, 'imagelist/grid1/check_missing_slice/')
+stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
+# gridnum = 1
+imgli_dir = os.path.join(imgli_root_dir, 'imagelist/grid1/')
 imgli_filename = '20190215_Bo_juvenile_overviewstackOBDp_add_missing_slice.csv'
-imgli_file = os.path.join(imgli_dir, imgli_filename)
-imgdf = pd.read_csv(imgli_file)
-plot_tile_pos(imgdf[::100])
-plt.show()
+imgli_file = os.path.join(imgli_dir, 'check_missing_slice', imgli_filename)
+visualize_tile_pos = False
 
+bbox_filename =  '20190215_Bo_juvenile_overviewstackOBDp_stack_grid0001_xy_corrected_bbox.csv'
+bbox_file = os.path.join(imgli_dir, 'correct_xy', bbox_filename)
 
-# imgli_dir = os.path.join(result_dir, 'imagelist')
-# stack_image_dir = os.path.join(result_dir, 'stack_image')
-# reload(logging)
-# logpath = os.path.join(result_dir, 'paste_tiles.log')
-# logging.basicConfig(filename=logpath, level=logging.DEBUG,
-#                     format='%(asctime)-15s %(message)s')
-# logging.info('Starting to paste tiles ...')
+tile_size_px_py = [1024, 768]  # unit in pixel
+overlap = 200  # unit in pixel
 
+result_dir = os.path.join(result_root_dir, 'grid1')
+stack_image_dir = os.path.join(result_dir, 'stack_image')
 
-# stack_name = '20190215_Bo_juvenile_overviewstackOBDp'
-# gridnum = 5
-# imgli_file = '{}_stack_grid{:04}_xy_translated_imagelist.csv'.format(stack_name, gridnum)
-# bboxfile =  '{}_stack_grid{:04}_bbox.csv'.format(stack_name, gridnum)
+reload(logging)
+logpath = os.path.join(result_dir, 'paste_tiles.log')
+logging.basicConfig(filename=logpath, level=logging.DEBUG,
+                    format='%(asctime)-15s %(message)s')
+logging.info('Starting to paste tiles ...')
 
-# tile_size_px_py = [2048, 1536]  # unit in px
-# pixel_size = 50.0  # unit in um
-# overlap = 200  # unit in px
+    
+imgdf = pd.read_csv(imgli_file, index_col=0)
+bbox = pd.read_csv(bbox_file)
+print(bbox)
+if visualize_tile_pos:
+    plot_tile_pos(imgdf[::100])
+    plt.show()
 
-# visualize_tile_pos = True
+grouped_imgdf = imgdf.groupby('slicenum')
+group_name_list = [name for name, group in grouped_imgdf]
 
-# # Load image list and bounding box
-# imgli_path = os.path.join(imgli_dir, imgli_file)
-# imgdf = pd.read_csv(imgli_path)
-# bbox = pd.read_csv(os.path.join(imgli_dir, bboxfile))
-# print(bbox)
-# # Visually check whether the tiles are lying on a grid in a stack
-# if visualize_tile_pos:
-#     plot_tile_pos(imgdf[::100])
+#for name, group in grouped_imgdf:
+#    paste_tiles_to_slice(group, bbox, tile_size_px_py,
+#                         data_root_dir,stack_image_dir, stack_name)
+#      
+break_slice_num = 1134
+break_group_idx = group_name_list.index(break_slice_num)
+print(break_group_idx)
+
+subgrouped = [g[1] for g in list(grouped_imgdf)[break_group_idx:break_group_idx+1]]
+for group in subgrouped:
+    paste_tiles_to_slice(group, bbox, tile_size_px_py,
+                         data_root_dir,stack_image_dir, stack_name)
